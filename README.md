@@ -1,6 +1,6 @@
 # SwiftMVI
 
-[![Swift](https://github.com/xtro/SwiftMVI/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/xtro/SwiftMVI/actions/workflows/swift.yml)
+[![Swift](https://github.com/xtro/SwiftMVI/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/xtro/SwiftMVI/actions/workflows/swift.yml) ![platforms](https://img.shields.io/badge/platform-iOS%20%7C%20watchOS%20%7C%20tvOS%20%7C%20macOS-333333) [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager) ![GitHub](https://img.shields.io/github/license/xtro/SwiftMVI) ![GitHub All Releases](https://img.shields.io/github/downloads/xtro/SwiftMVI/total)
 
 **SwiftMVI** is an open-source library of definitions and related extensions for modern swift application development.
 
