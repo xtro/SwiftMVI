@@ -1,5 +1,7 @@
 # SwiftMVI
 
+[![Swift](https://github.com/xtro/SwiftMVI/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/xtro/SwiftMVI/actions/workflows/swift.yml)
+
 **SwiftMVI** is an open-source library of definitions and related extensions for modern swift application development.
 
 ## Overview
