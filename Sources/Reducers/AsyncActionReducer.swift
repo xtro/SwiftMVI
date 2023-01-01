@@ -7,19 +7,15 @@
 public protocol AsyncActionReducer {
     /// An action.
     associatedtype Action
-    /// A reaction.
-    associatedtype Reaction
     /// Async action reducer
     /// - Parameter action: ``Action`` to reduce.
-    /// - Returns: a ``Reaction``
-    func reduce(action: Action) async throws -> Reaction
+    func reduce(action: Action) async
 }
 
 public extension Processing where Self: AsyncActionReducer {
     /// Processing a given ``AsyncActionReducer/Action`` asynchroniously.
     /// - Parameter action: An ``AsyncActionReducer/Action``.
-    /// - Returns: A ``AsyncActionReducer/Reaction``.
-    func action(_ action: Action) async throws -> Reaction {
-        try await reduce(action: action)
+    func action(_ action: Action) async {
+        await reduce(action: action)
     }
 }
