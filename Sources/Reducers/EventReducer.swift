@@ -97,3 +97,46 @@ public extension EventReducer where Self: Observer {
         bind(feature, receiveOn: receiveOn, to: event).store(in: &cancellables)
     }
 }
+
+extension IntentReducer where Self: EventReducer {
+    func callAsFunction(_ intent: Intent) async -> Event {
+        await withCheckedContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = publisher
+                .sink { _ in
+                } receiveValue: {
+                    continuation.resume(returning: $0)
+                    cancellable?.cancel()
+                }
+            self(intent)
+        }
+    }
+}
+extension IntentReducer where Self: Observer & ReducibleState {
+    func callAsFunction(_ intent: Intent) async -> State {
+        await withCheckedContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = objectWillChange
+                .sink { _ in
+                } receiveValue: { [self] in
+                    continuation.resume(returning: state)
+                    cancellable?.cancel()
+                }
+            self(intent)
+        }
+    }
+}
+extension AsyncIntentReducer where Self: EventReducer {
+    func callAsFunction(_ intent: Intent) async -> Event {
+        await reduce(intent: intent)
+        return await withCheckedContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = publisher
+                .sink { _ in
+                } receiveValue: {
+                    continuation.resume(returning: $0)
+                    cancellable?.cancel()
+                }
+        }
+    }
+}
