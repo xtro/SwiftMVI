@@ -27,8 +27,8 @@ You can use Swift Package Manager to integrate the library by adding the followi
 ```
 
 ## Usage
-[Getting Started](Documentation/Getting_Started.md)
-[Example application](https://github.com/xtro/SwiftMVI-Examples)
+- [Getting Started](Documentation/Getting_Started.md)
+- [Example application](https://github.com/xtro/SwiftMVI-Examples)
 
 ## Sponsors
 SwiftMVI is an MIT-licensed open-source project with its ongoing development made possible entirely by the support of awesome backers. If you'd like to join them, please consider sponsoring this development.
