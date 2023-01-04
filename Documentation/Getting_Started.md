@@ -38,11 +38,11 @@ extension Feature: IntentReducer, Processing {
         switch intent {
         case .increment:
             state {
-                $0 += 1
+                $0 + 1
             }
         case .decrement:
             state {
-                $0 -= 1
+                $0 - 1
             }
         }
     }

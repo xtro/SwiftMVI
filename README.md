@@ -24,19 +24,19 @@ First of all, in SwiftMVI state is a mutable ``ObservableObject``, therefore the
 - **MutableState** Use this type when your State is mutable (class)
 
 ### Reducers
-- **IntentReducer** An ability to process incomming intents from user.
-- **AsyncIntentReducer** An async version of **IntentReducer**.
-- **ActionReducer** An ability to process incomming action from itself or other reducers.
-- **AsyncActionReducer** An async version of **ActionReducer**.
-- **ReactionReducer** An ActionReducer that returns a Reaction.
-- **AsyncReactionReducer** An async version of **ReactionReducer**.
-- **EffectReducer** An ability to proccess incomming events from **Processing**.
-- **AsyncEffectReducer** An async version of **EffectReducer**.
+- **IntentReducer** - An ability to process incomming intents from user.
+- **AsyncIntentReducer** - An async version of **IntentReducer**.
+- **ActionReducer** - An ability to process incomming action from itself or other reducers.
+- **AsyncActionReducer** - An async version of **ActionReducer**.
+- **ReactionReducer** - An ActionReducer that returns a Reaction.
+- **AsyncReactionReducer** - An async version of **ReactionReducer**.
+- **EffectReducer** - An ability to proccess incomming events from **Processing**.
+- **AsyncEffectReducer** - An async version of **EffectReducer**.
 
 ### Binding combine publisher or another feature to an:
-- Intent ```bind(publisher){ .myIntent($0.value) }
-- Action ```bind(publisher){ .myAction($0.value) }
-- Effect ```bind(publisher){ .myEffect($0.value) }
+- Intent ```bind(publisher){ .myIntent($0.value) }```
+- Action ```bind(publisher){ .myAction($0.value) }```
+- Effect ```bind(publisher){ .myEffect($0.value) }```
 
 ## Installation
 You can use Swift Package Manager to integrate the library by adding the following dependency in your Package.swift file or by adding directly within Xcode:
