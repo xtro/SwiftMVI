@@ -13,7 +13,7 @@ public protocol EventReducer {
     var publisher: Publisher { get }
 }
 
-public extension Processing where Self: EventReducer {
+@MainActor public extension Processing where Self: EventReducer {
     /// Publish an event
     /// - Parameter event: An event defined in ``EventReducer/Event``.
     func publish(_ event: Event) {
@@ -62,10 +62,10 @@ public extension EventReducer where Self: ObservableObject {
     @discardableResult
     /// Receive state change from an observable object and transforms it to an ``Effect``
     /// - Parameters:
-    ///   - feature: A conformance of ``ReducibleState`` and **ObservableObject**.
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - action: Transform state of feature into an ``Effect``.
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to event: @escaping Transformer<F.State, Event>) -> AnyCancellable {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to event: @escaping Transformer<F.State, Event>) -> AnyCancellable {
         feature.objectWillChange
             .receive(on: receiveOn ?? DispatchQueue.main)
             .sink { [weak self] _ in
@@ -90,10 +90,10 @@ public extension EventReducer where Self: Observer {
 public extension EventReducer where Self: Observer {
     /// Receive state change from an observable object and transforms it to an ``Event``
     /// - Parameters:
-    ///   - feature: A conformance of ``ReducibleState`` and **ObservableObject**.
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - action: Transform state of feature into an ``Event``.
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to event: @escaping Transformer<F.State, Event>) {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to event: @escaping Transformer<F.State, Event>) {
         bind(feature, receiveOn: receiveOn, to: event).store(in: &cancellables)
     }
 }
@@ -112,7 +112,7 @@ extension IntentReducer where Self: EventReducer {
         }
     }
 }
-extension IntentReducer where Self: Observer & ReducibleState {
+extension IntentReducer where Self: Observer & MutableState {
     func callAsFunction(_ intent: Intent) async -> State {
         await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?

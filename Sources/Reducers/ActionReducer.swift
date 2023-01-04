@@ -8,7 +8,7 @@ import Foundation
 
 /// Action reducer is defines a process of doing something to achive an aim or fails. Its a type that represents all of the actions that can happen in your feature, such as notifications, event sources, other features and more
 ///
-/// Typically used instead of ``IntentReducer/Intent`` in cases when ``ReducibleState`` did not needed.
+/// Typically used instead of ``IntentReducer/Intent`` in cases when ``MutableState`` did not needed.
 public protocol ActionReducer {
     /// A representation of an action
     associatedtype Action
@@ -50,10 +50,10 @@ public extension ActionReducer where Self: ObservableObject {
     @discardableResult
     /// Receive state change from an observable object and transforms it to an ``Action``.
     /// - Parameters:
-    ///   - feature: A  feature contains a``ReducibleState`` and it should be an ``ObservableObject``.
+    ///   - feature: A  feature contains a``MutableState`` and it should be an ``ObservableObject``.
     ///   - action: Transform the state of feature into an ``Action``.
     /// - Returns: A cancellable instance of **AnyCancellable**..
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) -> AnyCancellable {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) -> AnyCancellable {
         feature.objectWillChange
             .receive(on: receiveOn ?? DispatchQueue.main)
             .sink { [weak self] _ in
@@ -87,10 +87,10 @@ public extension ActionReducer where Self: Observer {
 public extension ActionReducer where Self: Observer {
     /// Receive state change from an observable object and transforms it to an ``Action``
     /// - Parameters:
-    ///   - feature: A ``ReducibleState`` and an ObservableObject.
+    ///   - feature: A ``MutableState`` and an ObservableObject.
     ///   - action: Transform state of feature into an ``Action``.
     /// - Returns: A cancellable instance of AnyCancellable.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) {
         bind(feature, receiveOn: receiveOn, to: action).store(in: &cancellables)
     }
 }

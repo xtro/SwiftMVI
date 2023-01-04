@@ -7,7 +7,7 @@ import Foundation
 
 /// Intent reducer is a user intent to do something.
 public protocol AsyncIntentReducer {
-    /// A representation of user’s intents that typically changes the ``ReducibleState`` or emits an ``EventReducer/Event``
+    /// A representation of user’s intents that typically changes the ``MutableState`` or emits an ``EventReducer/Event``
     associatedtype Intent
     func reduce(intent: Intent) async
 }

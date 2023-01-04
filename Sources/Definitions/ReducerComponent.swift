@@ -7,9 +7,11 @@ import Combine
 import SwiftUI
 
 /// Reducer component is an implementation of reducer. A component is a simple class represents his own state and handle actions emiitted from other reducers.
-public protocol ReducerComponent: ReducibleState, Observer {
+public protocol ReducerComponent: MutableState, Observer {
     associatedtype Intent
     func reduce(intent: Intent) -> Bool
+    
+    init(_ state: State)
 }
 
 public extension ReducerComponent {

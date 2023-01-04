@@ -7,7 +7,7 @@ import Combine
 import Foundation
 import SwiftUI
 
-open class Observer: ObservableObject {
+open class Observer: ObservableObject, Observable {
     public var cancellables: Set<AnyCancellable> = []
     public init() {}
 }

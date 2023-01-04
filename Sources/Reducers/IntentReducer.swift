@@ -8,7 +8,7 @@ import Foundation
 
 /// Intent reducer is a user intent to do something.
 public protocol IntentReducer {
-    /// A representation of user’s intents that typically changes the ``ReducibleState`` or emits an ``EventReducer/Event``
+    /// A representation of user’s intents that typically changes the ``MutableState`` or emits an ``EventReducer/Event``
     associatedtype Intent
     func reduce(intent: Intent)
 }
@@ -52,10 +52,10 @@ public extension IntentReducer where Self: ObservableObject {
     @discardableResult
     /// Bind an ``Observer`` an ``Intent``
     /// - Parameters:
-    ///   - feature: A conformance of ``ReducibleState`` and **ObservableObject**.
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - intent: Transform publisher's result into an ``Intent``
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) -> AnyCancellable {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) -> AnyCancellable {
         feature.objectWillChange
             .receive(on: receiveOn ?? DispatchQueue.main)
             .sink { [weak self] _ in
@@ -89,10 +89,10 @@ public extension IntentReducer where Self: Observer {
 public extension IntentReducer where Self: Observer {
     /// Bind an **ObservableObject**  to a ``Intent``.
     /// - Parameters:
-    ///   - feature: A conformance of ``ReducibleState`` and **ObservableObject**.
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - intent: Transform publisher's result into an ``Intent``
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) {
         bind(feature, receiveOn: receiveOn, to: intent).store(in: &cancellables)
     }
 }

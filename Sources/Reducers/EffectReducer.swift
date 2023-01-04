@@ -6,7 +6,7 @@
 import Combine
 import Foundation
 
-/// Effect reducer is an internal type of ``IntentReducer/Intent`` in cases when ``ReducibleState`` is not needed.
+/// Effect reducer is an internal type of ``IntentReducer/Intent`` in cases when ``MutableState`` is not needed.
 public protocol EffectReducer {
     associatedtype Effect
     func reduce(effect: Effect)
@@ -45,10 +45,10 @@ public extension EffectReducer where Self: ObservableObject {
     @discardableResult
     /// Receive state change from an observable object and transforms it to an ``Effect``
     /// - Parameters:
-    ///   - feature: A conformance of ``ReducibleState`` and **ObservableObject**.
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - action: Transform state of feature into an ``Effect``.
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to effect: @escaping Transformer<F.State, Effect>) -> AnyCancellable {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to effect: @escaping Transformer<F.State, Effect>) -> AnyCancellable {
         feature.objectWillChange
             .receive(on: receiveOn ?? DispatchQueue.main)
             .sink { [weak self] _ in
@@ -80,10 +80,10 @@ public extension EffectReducer where Self: Observer {
 public extension EffectReducer where Self: Observer {
     /// Receive state change from an observable object and transforms it to an ``Effect``
     /// - Parameters:
-    ///   - feature: A conformance of ``ReducibleState`` and **ObservableObject**.
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - action: Transform state of feature into an ``Effect``.
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: ReducibleState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to effect: @escaping Transformer<F.State, Effect>) {
+    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to effect: @escaping Transformer<F.State, Effect>) {
         bind(feature, receiveOn: receiveOn, to: effect).store(in: &cancellables)
     }
 }
