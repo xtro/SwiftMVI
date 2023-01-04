@@ -1,20 +1,23 @@
 # Getting started
 To build a ui feature using the SwiftMVI you define some types and values that model your domain:
 
-- **ImmutableState**: An integer as the state of your UI.
+- **MutableState**: A type that describes the state of your UI.
 - **Intent**: A type that represents all of the user actions that can happen in your feature.
 - **IntentReducer**: A function that handles intents and processes them over time.
 - **Processing**: Enable processing functionalities in a feature.
 
-As a basic example, consider a UI that shows a number along with **+** and **−** buttons that increment and decrement the number.
+As a basic example, consider a UI that shows a number along with "+" and "−" buttons that increment and decrement the number.
 
 Here we need to define a type for the feature's state, which consists of an integer for the current count:
 
 ```swift
 import SwiftMVI
 
-class Feature: ObservableObject, ImmutableState {
-    var state = 0
+class Feature: ObservableObject, MutableState {
+    class State {
+        var count = 0
+    }
+    var state = State()
 }
 ```
 
@@ -38,11 +41,11 @@ extension Feature: IntentReducer, Processing {
         switch intent {
         case .increment:
             state {
-                $0 += 1
+                $0.count += 1
             }
         case .decrement:
             state {
-                $0 -= 1
+                $0.count -= 1
             }
         }
     }
@@ -61,7 +64,7 @@ struct FeatureView: View {
         VStack {
             HStack {
                 Button("−") { feature(.decrement) }
-                Text("\(feature.state)")
+                Text("\(feature.state.count)")
                 Button("+") { feature(.increment) }
             }
         }

@@ -26,7 +26,7 @@ You can use Swift Package Manager to integrate the library by adding the followi
 ## Usage
 To build a ui feature using the SwiftMVI you define some types and values that model your domain:
 
-- **ReducibleState**: A type that describes the state of your UI.
+- **MutableState**: A type that describes the state of your UI.
 - **Intent**: A type that represents all of the actions that can happen in your feature, such as user actions, notifications, event sources and more.
 - **IntentReducer**: A function that handle intents and process them over time.
 - **Processing**: Enable processing functionalities in a feature.
@@ -38,7 +38,7 @@ In here we need to define a type for the feature's state, which consists of an i
 ```swift
 import SwiftMVI
 
-class Feature: ObservableObject, ReducibleState {
+class Feature: ObservableObject, MutableState {
     class State {
         var count = 0
     }
@@ -117,7 +117,7 @@ struct FeatureView: View {
 - ``AsyncReactionReducer``
 
 ### State
-- ``ReducibleState``
+- ``MutableState``
 
 ### Processing
 - ``ReducerComponent``
