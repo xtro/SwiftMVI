@@ -42,7 +42,7 @@ First of all, in SwiftMVI state is a mutable ``ObservableObject``, therefore the
 You can use Swift Package Manager to integrate the library by adding the following dependency in your Package.swift file or by adding directly within Xcode:
 
 ```swift
-.package(url: "https://github.com/xtro/SwiftMVI.git", .upToNextMajor(from: "0.0.2"))
+.package(url: "https://github.com/xtro/SwiftMVI.git", .upToNextMajor(from: "0.1.0"))
 ```
 
 ## Usage
