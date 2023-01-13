@@ -1,7 +1,7 @@
 // ActionReducer.swift
 //
 // Copyright (c) 2022-2023 Gabor Nagy
-// Created by gabor.nagy.0814@gmail.com on 2022. 12. 23..
+// Created by gabor.nagy.0814@gmail.com on 2023. 01. 13.
 
 import Combine
 import Foundation
@@ -17,7 +17,7 @@ public protocol ActionReducer {
     func reduce(action: Action) throws
 }
 
-public extension ActionReducer where Self: ObservableObject {
+public extension ActionReducer {
     @discardableResult
     /// Bind a combine publisher to an ``Action``
     /// - Parameters:
@@ -29,35 +29,41 @@ public extension ActionReducer where Self: ObservableObject {
     func bind<P: Publisher>(_ publisher: P, receiveOn: DispatchQueue? = nil, onFail: Transformer<P.Failure, Action>? = nil, onComplete: Transformer<Bool, Action>? = nil, to action: @escaping Transformer<P.Output, Action>) -> AnyCancellable {
         publisher
             .receive(on: receiveOn ?? DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] complete in
+            .sink(receiveCompletion: { complete in
                 switch complete {
                 case .finished:
                     if let onComplete = onComplete {
-                        try? self?.reduce(action: onComplete(true))
+                        try? reduce(action: onComplete(true))
                     }
                 case let .failure(error):
                     if let onFail = onFail {
-                        try? self?.reduce(action: onFail(error))
+                        try? reduce(action: onFail(error))
                     }
                 }
-            }, receiveValue: { [weak self] output in
-                try? self?.reduce(action: action(output))
+            }, receiveValue: { output in
+                try? reduce(action: action(output))
             })
     }
 }
 
-public extension ActionReducer where Self: ObservableObject {
+public extension ActionReducer {
+    func callAsFunction(action: Action) {
+        try? reduce(action: action)
+    }
+}
+
+public extension ActionReducer {
     @discardableResult
     /// Receive state change from an observable object and transforms it to an ``Action``.
     /// - Parameters:
     ///   - feature: A  feature contains a``MutableState`` and it should be an ``ObservableObject``.
     ///   - action: Transform the state of feature into an ``Action``.
     /// - Returns: A cancellable instance of **AnyCancellable**..
-    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) -> AnyCancellable {
-        feature.objectWillChange
+    func bind<F: ReducibleState>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) -> AnyCancellable {
+        feature.statePublisher
             .receive(on: receiveOn ?? DispatchQueue.main)
-            .sink { [weak self] _ in
-                try? self?.reduce(action: action(feature.state))
+            .sink {
+                try? reduce(action: action($0))
             }
     }
 }
@@ -90,7 +96,7 @@ public extension ActionReducer where Self: Observer {
     ///   - feature: A ``MutableState`` and an ObservableObject.
     ///   - action: Transform state of feature into an ``Action``.
     /// - Returns: A cancellable instance of AnyCancellable.
-    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) {
+    func bind<F: ReducibleState>(_ feature: F, receiveOn: DispatchQueue? = nil, to action: @escaping Transformer<F.State, Action>) {
         bind(feature, receiveOn: receiveOn, to: action).store(in: &cancellables)
     }
 }

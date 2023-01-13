@@ -1,7 +1,7 @@
 // AsyncIntentReducer.swift
 //
 // Copyright (c) 2022-2023 Gabor Nagy
-// Created by gabor.nagy.0814@gmail.com on 2022. 12. 23..
+// Created by gabor.nagy.0814@gmail.com on 2023. 01. 13.
 
 import Foundation
 
@@ -13,8 +13,9 @@ public protocol AsyncIntentReducer {
 }
 
 public extension AsyncIntentReducer {
-    func callAsFunction(_ intent: Intent) {
-        Task.detached { [self] in
+    @discardableResult
+    func callAsFunction(_ intent: Intent, priority: TaskPriority? = nil) -> Task<Void, Never> {
+        Task.detached(priority: priority) { [self] in
             await reduce(intent: intent)
         }
     }

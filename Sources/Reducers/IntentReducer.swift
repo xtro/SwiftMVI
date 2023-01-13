@@ -1,7 +1,7 @@
 // IntentReducer.swift
 //
 // Copyright (c) 2022-2023 Gabor Nagy
-// Created by gabor.nagy.0814@gmail.com on 2022. 12. 23..
+// Created by gabor.nagy.0814@gmail.com on 2023. 01. 13.
 
 import Combine
 import Foundation
@@ -19,7 +19,16 @@ public extension IntentReducer {
     }
 }
 
-public extension IntentReducer where Self: ObservableObject {
+/// ``IntentReducer`` extension of ``Processing``
+public extension Processing where Self: IntentReducer {
+    /// Processing a given ``IntentReducer/Intent``
+    /// - Parameter intent: An ``IntentReducer/Intent``
+    func intent(_ intent: Intent) {
+        reduce(intent: intent)
+    }
+}
+
+public extension IntentReducer {
     @discardableResult
     /// Bind a combine publisher to an ``Intent``
     /// - Parameters:
@@ -31,45 +40,47 @@ public extension IntentReducer where Self: ObservableObject {
     func bind<P: Publisher>(_ publisher: P, receiveOn: DispatchQueue? = nil, onFail: Transformer<P.Failure, Intent>? = nil, onComplete: Transformer<Bool, Intent>? = nil, to intent: @escaping Transformer<P.Output, Intent>) -> AnyCancellable {
         publisher
             .receive(on: receiveOn ?? DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] complete in
+            .sink(receiveCompletion: { complete in
                 switch complete {
                 case .finished:
                     if let onComplete = onComplete {
-                        self?.reduce(intent: onComplete(true))
+                        reduce(intent: onComplete(true))
                     }
                 case let .failure(error):
-                    if let onFail = onFail {
-                        self?.reduce(intent: onFail(error))
+                    if let onFail {
+                        reduce(intent: onFail(error))
                     }
                 }
-            }, receiveValue: { [weak self] output in
-                self?.reduce(intent: intent(output))
+            }, receiveValue: {
+                reduce(intent: intent($0))
             })
     }
 }
 
-public extension IntentReducer where Self: ObservableObject {
+public extension IntentReducer {
     @discardableResult
     /// Bind an ``Observer`` an ``Intent``
     /// - Parameters:
     ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
     ///   - intent: Transform publisher's result into an ``Intent``
     /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) -> AnyCancellable {
-        feature.objectWillChange
+    func bind<F: ReducibleState>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) -> AnyCancellable {
+        feature.statePublisher
             .receive(on: receiveOn ?? DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.reduce(intent: intent(feature.state))
+            .sink {
+                reduce(intent: intent($0))
             }
     }
 }
 
-/// ``IntentReducer`` extension of ``Processing``
-public extension Processing where Self: IntentReducer {
-    /// Processing a given ``IntentReducer/Intent``
-    /// - Parameter intent: An ``IntentReducer/Intent``
-    func intent(_ intent: Intent) {
-        reduce(intent: intent)
+public extension IntentReducer where Self: Observer {
+    /// Bind an **ObservableObject**  to a ``Intent``.
+    /// - Parameters:
+    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
+    ///   - intent: Transform publisher's result into an ``Intent``
+    /// - Returns: A cancellable instance of **AnyCancellable**.
+    func bind<F: ReducibleState>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) {
+        bind(feature, receiveOn: receiveOn, to: intent).store(in: &cancellables)
     }
 }
 
@@ -83,16 +94,5 @@ public extension IntentReducer where Self: Observer {
     /// - Returns: A cancellable instance of **AnyCancellable**.
     func bind<P: Publisher>(_ publisher: P, receiveOn: DispatchQueue? = nil, onFail: Transformer<P.Failure, Intent>? = nil, onComplete: Transformer<Bool, Intent>? = nil, to intent: @escaping Transformer<P.Output, Intent>) {
         bind(publisher, receiveOn: receiveOn, onFail: onFail, onComplete: onComplete, to: intent).store(in: &cancellables)
-    }
-}
-
-public extension IntentReducer where Self: Observer {
-    /// Bind an **ObservableObject**  to a ``Intent``.
-    /// - Parameters:
-    ///   - feature: A conformance of ``MutableState`` and **ObservableObject**.
-    ///   - intent: Transform publisher's result into an ``Intent``
-    /// - Returns: A cancellable instance of **AnyCancellable**.
-    func bind<F: MutableState & ObservableObject>(_ feature: F, receiveOn: DispatchQueue? = nil, to intent: @escaping Transformer<F.State, Intent>) {
-        bind(feature, receiveOn: receiveOn, to: intent).store(in: &cancellables)
     }
 }
