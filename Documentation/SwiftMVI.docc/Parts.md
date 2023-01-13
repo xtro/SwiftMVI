@@ -1,4 +1,4 @@
-# Parts of the framwork
+# Parts
 
 ![Schema about current architecture](./Resources/processing_feature_schema@2x.png)
 

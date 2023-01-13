@@ -33,6 +33,56 @@ You can use Swift Package Manager to integrate the library by adding the followi
 - [Getting Started](Documentation/SwiftMVI.docc/Getting_Started.md)
 - [Parts of SwiftMVI](Documentation/SwiftMVI.docc/Parts.md)
 
+### Example
+
+Feature:
+
+```swift
+class CounterFeature: ReducibleState, IntentReducer, Processing {
+    var state: Int
+    var statePublisher: StatePublisher
+    
+    init(state: Int = 0) {
+        self.state = state
+        self.statePublisher = .init(state)
+    }
+    enum Intent {
+        case increment
+        case decrement
+    }
+    func reduce(intent: Intent) {
+        switch intent {
+        case .increment:
+            state {
+                $0 + 1
+            }
+        case .decrement:
+            state {
+                $0 - 1
+            }
+        }
+    }
+}
+```
+
+View:
+
+```swift
+struct CounterView: FeatureView {
+    let feature: CounterFeature
+    
+    func body(_ newState: Int) -> some View {
+        VStack {
+            HStack {
+                Button("−") { feature(.decrement) }
+                Text("\(newState)")
+                Button("+") { feature(.increment) }
+            }
+        }
+    }
+}
+```
+
 ## Sponsors
 SwiftMVI is an MIT-licensed open-source project with its ongoing development made possible entirely by the support of awesome backers. If you'd like to join them, please consider sponsoring this development.
 
