@@ -10,8 +10,8 @@ import SwiftUI
 public protocol ReducibleState {
     associatedtype State
     typealias StatePublisher = CurrentValueSubject<State, Never>
-    var state: State { nonmutating set get }
-    var statePublisher: StatePublisher { nonmutating set get }
+    var state: State { get nonmutating set }
+    var statePublisher: StatePublisher { get }
     func setup(state: State)
 }
 
@@ -22,12 +22,12 @@ public protocol HasDefault {
 public extension ReducibleState {
     func setup(state: State) {
         self.state = state
-        statePublisher = .init(state)
+//        statePublisher = .init(state)
     }
 
     func setup(state _: State) where State: HasDefault {
         state = State.default
-        statePublisher = .init(state)
+//        statePublisher = .init(state)
     }
 }
 
@@ -103,5 +103,12 @@ private func updateState(reducer: some ReducibleState, update: Bool = true, anim
         } else {
             reducer.statePublisher.send(reducer.state)
         }
+    }
+}
+
+
+public extension ReducibleState {
+    var statePublisher: StatePublisher {
+        Observed<State>.firstObserved(on: self, value: state) ?? StatePublisher(state)
     }
 }

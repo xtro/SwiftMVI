@@ -19,7 +19,7 @@ public struct Property<Value> {
             target[keyPath: keyPath] = $0
         }
         get = { [target] in
-            target[keyPath: keyPath]
+            return target[keyPath: keyPath]
         }
     }
 
@@ -28,7 +28,7 @@ public struct Property<Value> {
 }
 
 public extension Property {
-    func map(set: ((Value) -> Void)? = nil, get: (() -> Value)? = nil) -> Self {
+    func map(set: ((Value) -> Void)? = nil, get: ((Value) -> Value)? = nil) -> Self {
         let s = self.set
         let g = self.get
         return .init(
@@ -41,7 +41,7 @@ public extension Property {
             },
             get: {
                 if let get {
-                    return get()
+                    return get(g())
                 } else {
                     return g()
                 }

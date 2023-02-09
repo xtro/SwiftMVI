@@ -9,15 +9,15 @@ import Foundation
 /// Event reducer is a way to publish events.
 public protocol EventReducer {
     associatedtype Event
-    typealias Publisher = PassthroughSubject<Event, Never>
-    var publisher: Publisher { get }
+    typealias EventPublisher = PassthroughSubject<Event, Never>
+    var eventPublisher: EventPublisher { get }
 }
 
 public extension Processing where Self: EventReducer {
     /// Publish an event
     /// - Parameter event: An event defined in ``EventReducer/Event``.
     func publish(_ event: Event) {
-        publisher.send(event)
+        eventPublisher.send(event)
     }
 
     /// Publish a notification using given or default notification center.
@@ -33,7 +33,7 @@ public extension Processing where Self: EventReducer {
     /// Publish an event
     /// - Parameter event: An event defined in ``EventReducer/Event``.
     func publish(_ event: Event) async {
-        publisher.send(event)
+        eventPublisher.send(event)
     }
 
     /// Publish a notification using given or default notification center.
@@ -61,15 +61,15 @@ public extension EventReducer {
                 switch complete {
                 case .finished:
                     if let onComplete = onComplete {
-                        publisher.send(onComplete(true))
+                        eventPublisher.send(onComplete(true))
                     }
                 case let .failure(error):
                     if let onFail = onFail {
-                        publisher.send(onFail(error))
+                        eventPublisher.send(onFail(error))
                     }
                 }
             }, receiveValue: {
-                publisher.send(event($0))
+                eventPublisher.send(event($0))
             })
     }
 }
@@ -98,7 +98,7 @@ public extension EventReducer {
         feature.statePublisher
             .receive(on: receiveOn ?? DispatchQueue.main)
             .sink {
-                publisher.send(event($0))
+                eventPublisher.send(event($0))
             }
     }
 }
@@ -118,7 +118,7 @@ extension IntentReducer where Self: EventReducer {
     func callAsFunction(_ intent: Intent) async -> Event {
         await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?
-            cancellable = publisher
+            cancellable = eventPublisher
                 .sink { _ in
                 } receiveValue: {
                     continuation.resume(returning: $0)
@@ -149,7 +149,7 @@ extension AsyncIntentReducer where Self: EventReducer {
         await reduce(intent: intent)
         return await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?
-            cancellable = publisher
+            cancellable = eventPublisher
                 .sink { _ in
                 } receiveValue: {
                     continuation.resume(returning: $0)

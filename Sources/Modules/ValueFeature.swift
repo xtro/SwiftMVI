@@ -7,12 +7,13 @@ import SwiftUI
 
 public class ValueFeature<Value>: ReducibleState {
     public typealias State = Value
-    public var state: State
-    public var statePublisher: StatePublisher
+    @Observed public var state: State
 
     public required init(_ state: State) {
-        self.state = state
-        statePublisher = .init(state)
+        _state = Observed(wrappedValue: state)
+    }
+    public required init(value: Value) where Value == State {
+        state = value
     }
 }
 
@@ -38,19 +39,8 @@ extension ValueFeature: Modulable {
                 self(.update($0))
             },
             get: { [self] in
-                state
+                return state
             }
         )
-    }
-}
-
-public extension ValueFeature where Value == String {
-    var uppercased: Property<String> {
-        value
-            .map(
-                get: { [self] in
-                    state.uppercased()
-                }
-            )
     }
 }

@@ -39,7 +39,7 @@ private struct AlertEventReducerModifier<R: EventReducer, Value>: ViewModifier {
             .alert(isPresented: $isPresented) {
                 currentValue!
             }
-            .onReceive(reducer.publisher) { value in
+            .onReceive(reducer.eventPublisher) { value in
                 if persistent {
                     if currentValue == nil {
                         currentValue = path.value(of: value).map(transform)

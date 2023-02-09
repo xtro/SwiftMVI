@@ -11,37 +11,17 @@ import SwiftUI
 public protocol Modulable {
     associatedtype Value
     var value: Property<Value> { get }
+    
+    init(value: Value)
 }
 
 public extension Modulable {
     /// Synthesized binding property from ``value: Property<Value>``.
     var binding: Binding<Value> {
         Binding { [self] in
-            value.get()
+            return value.get()
         } set: { [self] in
             value.set($0)
         }
-    }
-}
-
-/// Modulable is a protocol for implementing feature modules
-public protocol OptionalModulable {
-    associatedtype Value
-    var value: Property<Value?> { get }
-}
-
-public extension Modulable where Self: ReducibleState, State == Value {
-    var boolValue: Property<Bool> {
-        .init(
-            set: { _ in
-            },
-            get: { [self] in
-                state != nil
-            }
-        )
-    }
-
-    var hasValue: Bool {
-        boolValue.get()
     }
 }

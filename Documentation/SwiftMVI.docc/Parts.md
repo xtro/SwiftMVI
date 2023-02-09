@@ -4,7 +4,8 @@
 
 ## Reducers and reducibles
 ### Reducibles
-- ``ReducibleState`` is representing your view as data. 
+- ``ReducibleState`` is representing your view as data, including a state related publisher. 
+- ``EventReducer`` is representing a publishable Event object and a publisher.  
 
 ### Reducers
 - ``IntentReducer`` An ability to process incomming intents from user.
@@ -16,10 +17,13 @@
 - ``EffectReducer`` An ability to proccess incomming events from **Processing**.
 - ``AsyncEffectReducer`` An async version of **EffectReducer**.
 
+- ``Observer`` An ability to observe other feaures and combine publishers.
+- ``Processing`` A mediator between reducers and reducibles.
+
 ## View
 
 ### Feature View
-``FeatureView`` is a new view protocol type for your. features, as well, unlike the View implementation, FeatureView has a feature propery and a body function for creating a view from the actual state of the feature. In this type you don't need to implement the standard body getter, its synthesized automaticaly origins from this function. 
+``FeatureView`` is a view protocol type especially for features, as well, unlike the standard SwiftUI view implementation, ``FeatureView`` have a feature and a body function for creating a view from the actual state of a feature. Using this type you don't need to implement the body getter variable. If it'snt implemented it will be automatically synthesized by this function. 
 
 ```swift
 struct MyFeatureView: FeatureView {
@@ -35,7 +39,7 @@ struct MyFeatureView: FeatureView {
 }
 ```
 
-As an extra, you can use a specified KeyPath (or a CasePath) for observation, in this case you need to update body function too:
+As an extra, you can use a specified KeyPath (or a CasePath) for observation, in this case you need to update body function too to match the path's value:
 
 ```swift
 struct MyFeatureView: FeatureView {
@@ -52,9 +56,9 @@ struct MyFeatureView: FeatureView {
 ```
 
 ### State Reducer View
-If your feature conforms to ``ReducibleState``, with this view you can display items when state was changed. You can subscribe to the whole state or a part of it, with a given KeyPath (or CasePath for enums).
+If your feature conforms to ``ReducibleState``, with this view you can display items after any part of your state was changed. You can make a subscription to the whole state or a part of it, with a given KeyPath (or CasePath for enums).
 
-This way you can use this reduced states in your views:
+This way you could use this reduced states in any SwiftUI view:
 
 ```swift
 StateReducerView(feature.$query) {
@@ -67,7 +71,8 @@ StateReducerView(feature, /AssetsFeature.State.assets) {
 ```
 
 ### Event Reducer View
-If your feature conforms to ``EventReducer``, with this view you can display items, when an event was fired. You can subscribe to the whole event object or a part of it, with a given KeyPath (or CasePath for enums).
+In that case, when your feature conforms to ``EventReducer``, with ``EventReducerView`` you can display items after an event was fired by the feature. 
+You can subscribe to the whole event object or a part of it, with a given KeyPath (or CasePath for enums).
 
 ```swift
 EventReducerView(feature.$queueFeature) {
@@ -76,7 +81,7 @@ EventReducerView(feature.$queueFeature) {
 ```
 
 ### Published Path View
-In the deepest level of view hiearchy you can found the Published Part View, an implementation of a feature observation and a keypath filteration to present a given view.
+In the deepest level of view hiearchy is the ``PublishedPathView``, an implementation for publisher observation & keypath filteration to present a view every event/state reducer view using this type.
 
 ```swift 
 struct PublishedPathView<Content: View, Reducer, Reducible, Reduced, P: Publisher, Value>: View where P.Failure == Never, P.Output == Reducible 
@@ -95,13 +100,18 @@ Present an alert for a given ``EventReducer`` and a KeyPath (or CasePath for enu
 func alert<R: EventReducer, V>(_ reducer: R, _ onEvent: KeyPath<R.Event, V>, persistent: Bool = false, map: @escaping (V) -> Alert) -> some View
 ```
 
+Present an alert for a given ``ReducibleState`` and a KeyPath (or CasePath for enums) for the observed value
+
+```swift
+func alert<R: ReducibleState, V>(_ reducer: R, _ onEvent: KeyPath<R.State, V>, persistent: Bool = false, map: @escaping (V) -> Alert) -> some View
+```
+
 #### Binding
 Handle any modulable as a binding.
 
 ```swift
 Binding.feature<M: Modulable>(_ feature: M) -> Binding<M.Value>
 ```
-
 
 ## Modules
 The key concept behind Modules is to connect small independent features into bigger one as effective as possible, while keep your modules light as possible. 

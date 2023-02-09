@@ -13,12 +13,10 @@ Here you need to define a type for the feature's state, which consists of an int
 import SwiftMVI
 
 class CounterFeature: ReducibleState {
-    var state: Int
-    var statePublisher: StatePublisher
+    @Observed var state: Int
     
     init(state: Int = 0) {
         self.state = state
-        self.statePublisher = .init(state)
     }
 }
 ```

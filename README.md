@@ -39,12 +39,10 @@ Feature:
 
 ```swift
 class CounterFeature: ReducibleState, IntentReducer, Processing {
-    var state: Int
-    var statePublisher: StatePublisher
+    @Observed var state: Int
     
     init(state: Int = 0) {
         self.state = state
-        self.statePublisher = .init(state)
     }
     enum Intent {
         case increment

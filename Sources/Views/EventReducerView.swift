@@ -42,6 +42,6 @@ public struct EventReducerView<Content: View, Reducer: EventReducer, Value>: Vie
     }
 
     public var body: some View {
-        PublishedPathView(reducer, persistent: persistent, map: { $0 }, publisher: reducer.publisher, path: path, content: content)
+        PublishedPathView(reducer, persistent: persistent, map: { $0 }, publisher: reducer.eventPublisher, path: path, content: content)
     }
 }

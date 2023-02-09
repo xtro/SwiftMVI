@@ -33,6 +33,10 @@ public extension FeatureModule where Feature: ReducibleState {
 }
 
 public extension FeatureModule {
+    init(wrappedValue: Value, _ : Feature.Type) where Value == Feature.Value {
+        self.feature = Feature(value: wrappedValue)
+        map = \Feature.value
+    }
     init(_ feature: Feature) where Value == Feature.Value {
         self.feature = feature
         map = \Feature.value
